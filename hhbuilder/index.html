@@ -51,6 +51,130 @@
         <pre class="debug"></pre>
         <script>
             // your code goes here ...
+            /**
+             * create namespace
+             * @type {{}}
+             */
+            var NS = NS || {};
+
+            NS.validateAdd = function () {
+                var formEl = document.getElementsByTagName('form')[0];
+                var formElements = formEl.elements;
+                var ageEl = formElements.namedItem('age');
+                var relEl = formElements.namedItem('rel');
+                var fieldsValidated ;
+
+                fieldsValidated =
+                        !!(ageEl.value !== '' && parseInt(ageEl.value) > 0);
+                fieldsValidated = fieldsValidated &&
+                        (relEl.options[relEl.selectedIndex].value !== '');
+                return fieldsValidated;
+            };
+
+            NS.addButtonHandler = function(evt) {
+                if ( NS.validateAdd() ) {
+                    NS.addIndividual();
+                }
+                evt.preventDefault();
+            };
+
+            NS.addIndividual = function() {
+                var newIndividualContainer ;
+                var newIndividualAge ;
+                var newIndividualRel ;
+                var newIndividualSmoker;
+                var deleteButtonContainer;
+                var deleteButton;
+
+                var bodyEl = document.getElementsByTagName('body')[0];
+                var formEl = document.getElementsByTagName('form')[0];
+                var formElements = formEl.elements;
+                var ageEl = formElements.namedItem('age');
+                var relEl = formElements.namedItem('rel');
+                var smokerEl = formElements.namedItem('smoker');
+
+                newIndividualContainer = document.createElement('div');
+                newIndividualContainer.setAttribute('class','individualContainer');
+                newIndividualAge = document.createElement('div');
+                newIndividualAge.innerText = ageEl.value;
+                newIndividualContainer.appendChild(newIndividualAge);
+
+                newIndividualRel = document.createElement('div');
+                newIndividualRel.innerText = relEl.options[relEl.selectedIndex].value;
+                newIndividualContainer.appendChild(newIndividualRel);
+
+                newIndividualSmoker = document.createElement('div');
+                newIndividualSmoker.innerText = smokerEl.checked;
+                newIndividualContainer.appendChild(newIndividualSmoker);
+
+                deleteButtonContainer = document.createElement('div');
+                deleteButton = document.createElement('button');
+                deleteButton.appendChild(document.createTextNode('delete'));
+                deleteButton.onclick = NS.deleteIndividual;
+                deleteButtonContainer.appendChild(deleteButton);
+                newIndividualContainer.appendChild(deleteButtonContainer);
+
+                bodyEl.appendChild(newIndividualContainer);
+            };
+
+            NS.deleteIndividual = function() {
+                var newIndividualContainer = this.parentNode.parentNode;
+                var bodyEl = document.getElementsByTagName('body')[0];
+                bodyEl.removeChild(newIndividualContainer);
+            };
+
+            NS.submitHandler = function(evt) {
+                var addedIndividualsObject = NS.getAddedIndividualsObject();
+                NS.populateDebugEl(addedIndividualsObject);
+                NS.submitFormViaAjax(addedIndividualsObject);
+                evt.preventDefault();
+            };
+
+            NS.populateDebugEl = function(serialisedIndividuals) {
+                var debugEl = document.getElementsByTagName('pre')[0];
+                debugEl.style.display='none';
+                if ( ! (Object.keys(serialisedIndividuals).length === 0
+                        && serialisedIndividuals.constructor === Object)){
+                    debugEl.innerText =JSON.stringify(serialisedIndividuals);
+                    debugEl.style.display='block';
+                }
+            };
+
+            NS.submitFormViaAjax = function(serialisedIndividuals) {
+                var xhr;
+                if ( ! (Object.keys(serialisedIndividuals).length === 0
+                        && serialisedIndividuals.constructor === Object)) {
+                    xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'sameDomain');
+                    xhr.setRequestHeader('Content-type', 'application/json');
+                    xhr.onload = function () {
+                        // some fake processing here
+                    };
+                    xhr.send(JSON.stringify(serialisedIndividuals));
+                }
+            };
+
+            NS.getAddedIndividualsObject = function() {
+                var addedIndividualsObject = {};
+                var eachSerialisedIndividual;
+                var divsInEachIndividual;
+                var newIndividuals = document.getElementsByClassName('individualContainer');
+
+                for (var i=0; i<newIndividuals.length;i++) {
+                    divsInEachIndividual = newIndividuals[i].childNodes;
+                    eachSerialisedIndividual = {};
+                    eachSerialisedIndividual['age']= divsInEachIndividual[0].innerText;
+                    eachSerialisedIndividual['rel']= divsInEachIndividual[1].innerText;
+                    eachSerialisedIndividual['smoker']= divsInEachIndividual[2].innerText;
+                    addedIndividualsObject[i] = eachSerialisedIndividual;
+                }
+
+                return addedIndividualsObject;
+            };
+
+            document.getElementsByClassName('add')[0].onclick = NS.addButtonHandler;
+
+            document.getElementsByTagName('form')[0].onsubmit = NS.submitHandler;
         </script>
     </body>
 </html>
