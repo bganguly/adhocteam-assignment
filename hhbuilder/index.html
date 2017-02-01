@@ -58,7 +58,7 @@
             var NS = NS || {};
 
             NS.validateAdd = function () {
-                var formEl = document.getElementsByTagName('form')[0];
+                var formEl = document.querySelector('form');
                 var formElements = formEl.elements;
                 var ageEl = formElements.namedItem('age');
                 var relEl = formElements.namedItem('rel');
@@ -86,15 +86,14 @@
                 var deleteButtonContainer;
                 var deleteButton;
 
-                var bodyEl = document.getElementsByTagName('body')[0];
-                var formEl = document.getElementsByTagName('form')[0];
-                var formElements = formEl.elements;
+                var formElements = document.querySelector('form').elements;
                 var ageEl = formElements.namedItem('age');
                 var relEl = formElements.namedItem('rel');
                 var smokerEl = formElements.namedItem('smoker');
 
                 newIndividualContainer = document.createElement('div');
                 newIndividualContainer.setAttribute('class','individualContainer');
+
                 newIndividualAge = document.createElement('div');
                 newIndividualAge.innerText = ageEl.value;
                 newIndividualContainer.appendChild(newIndividualAge);
@@ -114,13 +113,12 @@
                 deleteButtonContainer.appendChild(deleteButton);
                 newIndividualContainer.appendChild(deleteButtonContainer);
 
-                bodyEl.appendChild(newIndividualContainer);
+                document.body.appendChild(newIndividualContainer);
             };
 
             NS.deleteIndividual = function() {
                 var newIndividualContainer = this.parentNode.parentNode;
-                var bodyEl = document.getElementsByTagName('body')[0];
-                bodyEl.removeChild(newIndividualContainer);
+                document.body.removeChild(newIndividualContainer);
             };
 
             NS.submitHandler = function(evt) {
@@ -131,7 +129,7 @@
             };
 
             NS.populateDebugEl = function(serialisedIndividuals) {
-                var debugEl = document.getElementsByTagName('pre')[0];
+                var debugEl = document.querySelector('pre');
                 debugEl.style.display='none';
                 if ( ! (Object.keys(serialisedIndividuals).length === 0
                         && serialisedIndividuals.constructor === Object)){
@@ -158,7 +156,7 @@
                 var addedIndividualsObject = {};
                 var eachSerialisedIndividual;
                 var divsInEachIndividual;
-                var newIndividuals = document.getElementsByClassName('individualContainer');
+                var newIndividuals = document.querySelectorAll('.individualContainer');
 
                 for (var i=0; i<newIndividuals.length;i++) {
                     divsInEachIndividual = newIndividuals[i].childNodes;
@@ -172,9 +170,10 @@
                 return addedIndividualsObject;
             };
 
-            document.getElementsByClassName('add')[0].onclick = NS.addButtonHandler;
+            document.querySelector('.add').addEventListener('click',NS.addButtonHandler);
 
-            document.getElementsByTagName('form')[0].onsubmit = NS.submitHandler;
+            document.querySelector("button[type='submit']")
+                    .addEventListener('click',NS.submitHandler);
         </script>
     </body>
 </html>
